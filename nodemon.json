@@ -1,0 +1,8 @@
+{
+    "env": {
+        "DB_USER": "Noopur",
+        "DB_PASSWORD": "666787kul",
+        "DB_NAME": "New_Mern",
+        "JWT_KEY":"supersecret_dont_share"
+    }
+}
