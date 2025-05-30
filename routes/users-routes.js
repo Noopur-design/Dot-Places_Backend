@@ -2,7 +2,7 @@ const express = require('express');
 const { check } = require('express-validator');
 
 const usersController = require('../controllers/users-controllers');
-const fileUpload = require('../middleware/file-upload');
+const fileUpload = require('../middleware/file-upload'); // ✅ Now uses memoryStorage
 
 const router = express.Router();
 
@@ -10,14 +10,10 @@ router.get('/', usersController.getUsers);
 
 router.post(
   '/signup',
-  fileUpload.single('image'),
+  fileUpload.single('image'), // ✅ Receives image as buffer
   [
-    check('name')
-      .not()
-      .isEmpty(),
-    check('email')
-      .normalizeEmail()
-      .isEmail(),
+    check('name').not().isEmpty(),
+    check('email').normalizeEmail().isEmail(),
     check('password').isLength({ min: 6 })
   ],
   usersController.signup
