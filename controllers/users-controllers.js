@@ -58,14 +58,14 @@ const signup = async (req, res, next) => {
     );
     return next(error);
   }
-
-  const createdUser = new User({
-    name,
-    email,
-    image: req.file.path,
-    password: hashedPassword,
-    places: []
-  });
+  
+const createdUser = new User({
+  name,
+  email,
+  image: req.file ? req.file.path : 'uploads/images/default.jpg', // fallback image
+  password: hashedPassword,
+  places: []
+});
 
   try {
     await createdUser.save();
