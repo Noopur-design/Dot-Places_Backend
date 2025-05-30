@@ -1,4 +1,7 @@
 const multer = require("multer");
+const { v4: uuidv4 } = require("uuid");
+const fs = require("fs");
+const path = require("path");
 
 const MIME_TYPE_MAP = {
   "image/png": "png",
@@ -17,13 +20,34 @@ const MIME_TYPE_MAP = {
   "image/avif": "avif",
 };
 
-const fileUpload = multer({
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
-  storage: multer.memoryStorage(), // ✅ Use memoryStorage for Vercel
-  fileFilter: (req, file, cb) => {
-    const isValid = !!MIME_TYPE_MAP[file.mimetype];
-    cb(isValid ? null : new Error("Invalid mime type!"), isValid);
+// Ensure upload folder exists
+const uploadPath = path.join(__dirname, '..', 'uploads', 'images');
+if (!fs.existsSync(uploadPath)) {
+  fs.mkdirSync(uploadPath, { recursive: true });
+}
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, uploadPath);
   },
+  filename: (req, file, cb) => {
+    const ext = MIME_TYPE_MAP[file.mimetype];
+    if (!ext) {
+      return cb(new Error("Unsupported file type"), null);
+    }
+    cb(null, uuidv4() + "." + ext);
+  }
+});
+
+const fileFilter = (req, file, cb) => {
+  const isValid = !!MIME_TYPE_MAP[file.mimetype];
+  cb(isValid ? null : new Error("Invalid mime type!"), isValid);
+};
+
+const fileUpload = multer({
+  storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB limit
+  fileFilter,
 });
 
 module.exports = fileUpload;
